@@ -28,16 +28,10 @@
       clearable
       v-bind="f"
     >
-      <template
-        v-if="f.prefix2"
-        #prefix
-      >
+      <template v-if="f.prefix2" #prefix>
         {{ f.prefix2 }}
       </template>
-      <template
-        v-if="f.suffix"
-        #suffix
-      >
+      <template v-if="f.suffix" #suffix>
         {{ f.suffix }}
       </template>
     </n-input-number>
@@ -55,8 +49,6 @@
           'daterange',
           'year',
           'monthrange',
-          'datetime',
-          'datetimerange',
           'yearrange',
           'quarter',
           'quarterrange',
@@ -68,11 +60,14 @@
       :format="'dd/MM/yyyy'"
       v-bind="f"
     />
-    <n-spin
-      v-else-if="f.type == 'cascader'"
-      size="10"
-      :show="loading"
-    >
+    <n-date-picker
+      v-else-if="['datetime', 'datetimerange'].indexOf(f.type) >= 0"
+      v-model:formatted-value="value"
+      value-format="yyyy-MM-dd HH:mm:ss"
+      :format="'dd/MM/yyyy'"
+      v-bind="f"
+    />
+    <n-spin v-else-if="f.type == 'cascader'" size="10" :show="loading">
       <n-cascader
         v-model:value="value"
         multiple
@@ -85,34 +80,19 @@
         v-bind="f"
       />
     </n-spin>
-    <n-switch
-      v-else-if="f.type == 'bool'"
-      v-model:value="value"
-      v-bind="f"
-    />
-    <n-input
-      v-else
-      v-model:value="value"
-      clearable
-      v-bind="f"
-    >
-      <template
-        v-if="f.prefix2"
-        #prefix
-      >
+    <n-switch v-else-if="f.type == 'bool'" v-model:value="value" v-bind="f" />
+    <n-input v-else v-model:value="value" clearable v-bind="f">
+      <template v-if="f.prefix2" #prefix>
         {{ f.prefix2 }}
       </template>
-      <template
-        v-if="f.suffix"
-        #suffix
-      >
+      <template v-if="f.suffix" #suffix>
         {{ f.suffix }}
       </template>
     </n-input>
   </div>
 </template>
 <script setup>
-import { computed, useAttrs, ref, watch } from "vue";
+import { normalizeDatetime } from "../utils";
 
 defineOptions({
   name: "DInput",
@@ -129,9 +109,6 @@ const props = defineProps({
   prefix: { required: false, type: String, default: "" },
 });
 const attrs = useAttrs();
-const value = ref(
-  props.modelValue ? props.modelValue : attrs.default ? attrs.default : null
-);
 
 const asyncPropsValue = ref({});
 const loadingAsync = ref(false);
@@ -168,11 +145,28 @@ const f = computed(() => {
   return field;
 });
 
+const initialValue = () => {
+  const raw = props.modelValue ?? attrs.default ?? null;
+  if (!raw) return null;
+
+  if (['datetime', 'datetimerange'].includes(f.value.type)) {
+    return normalizeDatetime(raw);
+  }
+
+  return raw;
+};
+
+const value = ref(initialValue());
+
 const emit = defineEmits(["update:modelValue"]);
 watch(
   () => props.modelValue,
   (newValue) => {
-    value.value = newValue;
+    if (["datetime", "datetimerange"].includes(f.value.type)) {
+      value.value = normalizeDatetime(newValue);
+    } else {
+      value.value = newValue;
+    }
   }
 );
 watch(

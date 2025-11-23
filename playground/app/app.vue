@@ -19,7 +19,8 @@
         return-object
         :row-key="(row) => row.id"
         selected-class="selected"
-      />{{ data[0] }}
+        @put="updateData($event)"
+      />
       <n-button @click="reset()"> clear </n-button>
       <!-- <d-input
       v-for="f in fields"
@@ -61,6 +62,7 @@ const data = ref([
     text: null,
     currency: 2343.56,
     date: "2032-12-12",
+    datetime: "2025-02-26 11:55:14",
     bool: false,
     category: "ok",
     percent: 80,
@@ -69,6 +71,7 @@ const data = ref([
     lista: ["1", "2", "7"],
     children: [
       {
+        id: "child99999",
         text: "vvvvvvvvvvvvvvvv",
         currency: 2343.56,
         date: "2022-12-12",
@@ -79,6 +82,7 @@ const data = ref([
         year: "2024",
       },
     ],
+    lista: ["1", "2", "7"],
   },
   {
     id: "9999989999",
@@ -87,9 +91,11 @@ const data = ref([
     date: "2022-12-12",
     bool: true,
     category: "pending",
+    datetime: "2025-02-26 11:55:14",
     percent: 45,
     int: 4,
     year: "2024",
+    lista: ["1", "2", "7"],
   },
 ]);
 
@@ -105,9 +111,16 @@ for (let i = 0; i < 10000; i++) {
     int: 4,
     year: "2024",
     number: 2.53432,
-    datetime: "2004-02-26 11:55:14.000",
+    lista: [i, i + 1, i + 2],
   });
 }
+
+const updateData = (editedRow) => {
+  const index = data.value.findIndex((d) => d.id === editedRow.id);
+  if (index >= 0) {
+    data.value[index] = editedRow;
+  }
+};
 
 const getOptions = () => {
   return new Promise((resolve) => {

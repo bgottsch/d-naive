@@ -75,3 +75,35 @@ export const getValue = (row, field) => {
   }
   return v
 }
+
+export const normalizeDatetime = (input) => {
+  if (!input) return null;
+
+  let date;
+
+  if (input instanceof Date) {
+    date = input;
+  } else if (typeof input === "string") {
+    const normalized = input.replace(/\//g, "-").replace("T", " ");
+
+    date = new Date(normalized);
+  } else if (typeof input === "number") {
+    date = new Date(input);
+  } else {
+    return null;
+  }
+
+  if (isNaN(date)) return null;
+
+  const pad = (n) => (n < 10 ? "0" + n : n);
+
+  const yyyy = date.getFullYear();
+  const mm = pad(date.getMonth() + 1);
+  const dd = pad(date.getDate());
+
+  const hh = pad(date.getHours());
+  const mi = pad(date.getMinutes());
+  const ss = pad(date.getSeconds());
+
+  return `${yyyy}-${mm}-${dd} ${hh}:${mi}:${ss}`;
+};
