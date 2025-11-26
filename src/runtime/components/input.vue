@@ -67,8 +67,8 @@
       :format="'dd/MM/yyyy'"
       v-bind="f"
     />
-    <n-spin v-else-if="f.type == 'cascader'" size="10" :show="loading">
-      <n-cascader
+    <n-spin v-else-if="f.type == 'cascader'" size="small" :show="loading">
+      <n-cascader 
         v-model:value="value"
         multiple
         clearable
@@ -121,7 +121,7 @@ if (props.asyncProps) {
 }
 
 const loading = computed(() => {
-  return loadingAsync.value || f.value.loading;
+  return loadingAsync.value ?? f.value.loading ?? false;
 });
 
 const f = computed(() => {

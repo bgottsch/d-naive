@@ -6,7 +6,18 @@
         {{ f.title }} - {{ formatValue(d, f) }}
       </p> </span
     >{{ selected }} -->
-      <d-input type="select" :async-props="getOptions" />
+      <v-col
+        v-for="f in filters"
+        :key="f.label"
+        :cols="12"
+        :sm="f.sm ? f.sm : ''"
+        :xl="f.xl ? f.xl : 2"
+        >
+        <d-input
+          v-bind="f"
+        >
+        </d-input>
+      </v-col>
 
       <n-button @click="filter()"> filter </n-button>
       <d-data-table
@@ -130,7 +141,7 @@ const getOptions = () => {
         options.push({ label: `Option ${i}`, value: `option_${i}` });
       }
       resolve({ options });
-    }, 1000);
+    }, 10000);
   });
 };
 
@@ -176,6 +187,29 @@ const fields = ref([
   //   format: "dd/MM/yyyy HH:mm:ss.SSS",
   // },
 ]);
+
+const filters = [
+  {
+    label: "Options Cascader",
+    type: "cascader",
+    asyncProps: getOptions,
+    checkStrategy: "child",
+  },
+  {
+    label: "Options Select Single",
+    type: "select",
+    asyncProps: getOptions,
+  },
+  {
+    label: "Options Select Multiple",
+    sm: "6",
+    xl: "10",
+    cols: "12",
+    type: "select",
+    asyncProps: getOptions,
+    multiple: true,
+  },
+];
 </script>
 <style scoped>
 :deep(.selected td) {
