@@ -1,7 +1,12 @@
 import { defineNuxtModule, createResolver, addComponentsDir, addImports, addPluginTemplate } from '@nuxt/kit'
 
-// Module options TypeScript interface definition
-export interface ModuleOptions { }
+// Module options TypeScript interface definition.
+// These are exposed to runtime via `$dNaive` and consumed by `formatValue`.
+export interface ModuleOptions {
+  precision?: number
+  minPrecision?: number
+  maxPrecision?: number
+}
 export default defineNuxtModule<ModuleOptions>({
   meta: {
     name: 'd-naive',
