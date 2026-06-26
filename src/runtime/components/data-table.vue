@@ -26,12 +26,12 @@ import {
 	NVirtualList,
 	createDiscreteApi,
 	NBadge,
+	useThemeVars,
 } from "naive-ui";
 
-import { computed, ref, watch, useAttrs, h, toRaw, nextTick } from "vue";
+import { computed, ref, watch, useAttrs, h, toRaw, nextTick, onMounted, onBeforeUnmount } from "vue";
 import { formatValue, getValue, toDate } from "../utils";
 import DInput from "./input.vue";
-import { useThemeVars } from "naive-ui";
 const themeVars = useThemeVars();
 const { message, dialog } = createDiscreteApi(["message", "dialog"]);
 
@@ -179,9 +179,13 @@ const emit = defineEmits([
 	"delete",
 	"dragColumn",
 ]);
-window.addEventListener("mouseup", function () {
+// Drag-to-reorder column release. Registered on mount (SSR-safe: no `window`
+// at setup time) and removed on unmount so listeners don't leak per table.
+const stopDragging = () => {
 	isDragging = null;
-});
+};
+onMounted(() => window.addEventListener("mouseup", stopDragging));
+onBeforeUnmount(() => window.removeEventListener("mouseup", stopDragging));
 
 const rowProps = (rowData, rowIndex) => ({
 	onClick: () => {
@@ -903,7 +907,7 @@ const processColumns = () => {
 													);
 													emit("put", editedRow.value);
 													editedIndex.value = null;
-													editedRow.value = -1;
+													editedRow.value = null;
 												},
 											});
 										},
