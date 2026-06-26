@@ -2,7 +2,10 @@
   "name": "@bgottsch/d-naive",
   "version": "1.8.11",
   "description": "Vue library designed to enhance Naive UI components with additional functionalities for complex data handling and user input management",
-  "repository": "bgottsch/d-naive",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bgottsch/d-naive.git"
+  },
   "license": "MIT",
   "type": "module",
   "exports": {
