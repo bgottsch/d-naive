@@ -58,6 +58,7 @@
       v-model:formatted-value="value"
       value-format="yyyy-MM-dd"
       :format="'dd/MM/yyyy'"
+      :update-value-on-close="true"
       v-bind="f"
     />
     <n-date-picker
@@ -65,6 +66,7 @@
       v-model:formatted-value="value"
       value-format="yyyy-MM-dd HH:mm:ss"
       :format="'dd/MM/yyyy'"
+      :update-value-on-close="true"
       v-bind="f"
     />
     <n-spin v-else-if="f.type == 'cascader'" size="small" :show="loading">
@@ -92,6 +94,7 @@
   </div>
 </template>
 <script setup>
+import { computed, ref, watch, useAttrs } from "vue";
 import { normalizeDatetime } from "../utils";
 
 defineOptions({
@@ -121,7 +124,9 @@ if (props.asyncProps) {
 }
 
 const loading = computed(() => {
-  return loadingAsync.value ?? f.value.loading ?? false;
+  // `loadingAsync.value` is always a boolean, so `??` never fell through to the
+  // field's own `loading`; use `||` so an explicit `loading` prop is honoured.
+  return loadingAsync.value || f.value.loading || false;
 });
 
 const f = computed(() => {
