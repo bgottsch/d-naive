@@ -15,8 +15,7 @@
         >
         <d-input
           v-bind="f"
-        >
-        </d-input>
+        />
       </v-col>
 
       <n-button @click="filter()"> filter </n-button>
@@ -145,6 +144,46 @@ const getOptions = () => {
   });
 };
 
+// Multi-level (3 levels) cascade: Região → UF → Cidade. The cascader renders as
+// many levels as the options nest via `children` — a flat list (like getOptions
+// above) is just the single-level case.
+const getCascadeOptions = () => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      const tree = {
+        Sudeste: {
+          SP: ["São Paulo", "Campinas", "Santos"],
+          RJ: ["Rio de Janeiro", "Niterói"],
+          MG: ["Belo Horizonte", "Uberlândia"],
+        },
+        Sul: {
+          PR: ["Curitiba", "Londrina"],
+          RS: ["Porto Alegre", "Caxias do Sul"],
+          SC: ["Florianópolis", "Joinville"],
+        },
+        Nordeste: {
+          BA: ["Salvador", "Feira de Santana"],
+          PE: ["Recife", "Olinda"],
+          CE: ["Fortaleza"],
+        },
+      };
+      const options = Object.entries(tree).map(([regiao, estados]) => ({
+        label: regiao,
+        value: regiao,
+        children: Object.entries(estados).map(([uf, cidades]) => ({
+          label: uf,
+          value: uf,
+          children: cidades.map((cidade) => ({
+            label: cidade,
+            value: `${uf}-${cidade}`,
+          })),
+        })),
+      }));
+      resolve({ options });
+    }, 600);
+  });
+};
+
 const fields = ref([
   { type: "selection" },
   { title: "lista", key: "lista", type: "list" },
@@ -190,10 +229,40 @@ const fields = ref([
 
 const filters = [
   {
-    label: "Options Cascader",
+    label: "Options Cascader (1 nível / flat)",
     type: "cascader",
     asyncProps: getOptions,
     checkStrategy: "child",
+  },
+  {
+    label: "Localização (cascade 3 níveis, async)",
+    type: "cascader",
+    asyncProps: getCascadeOptions,
+    checkStrategy: "child",
+  },
+  {
+    label: "Cesta (cascade 2 níveis, sync)",
+    type: "cascader",
+    checkStrategy: "child",
+    options: [
+      {
+        label: "Frutas",
+        value: "frutas",
+        children: [
+          { label: "Maçã", value: "maca" },
+          { label: "Banana", value: "banana" },
+          { label: "Laranja", value: "laranja" },
+        ],
+      },
+      {
+        label: "Legumes",
+        value: "legumes",
+        children: [
+          { label: "Cenoura", value: "cenoura" },
+          { label: "Batata", value: "batata" },
+        ],
+      },
+    ],
   },
   {
     label: "Options Select Single",
